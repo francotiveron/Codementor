@@ -12,7 +12,7 @@ namespace MyIdeaPool
         internal static void CheckLogin(HttpRequestMessage request)
         {
             var jwt = request.Headers.GetValues("X-Access-Token").First();
-            if (!Storage.Exists(jwt)) throw new Exception("access token is unknown");
+            if (!Storage.UserExists(jwt)) throw new Exception("access token is unknown");
             if (Jwt.IsExpired(jwt)) throw new Exception("access token is expired");
         }
         public static Jwt.Token Login(string email, string password)
@@ -68,6 +68,8 @@ namespace MyIdeaPool
         {
             //Validation.Validate(_idea);
             if (id == null) id = Guid.NewGuid().ToString();
+            else
+            if (!Storage.IdeaExists(id)) throw new Exception("idea not found");
             var idea = new Idea(id, _idea);
             Storage.PutIdea(idea);
             return idea;

@@ -88,7 +88,7 @@ namespace MyIdeaPool.Controllers
             Actions.CheckLogin(Request);
             if (ModelState.IsValid)
             {
-                return Request.CreateResponse(HttpStatusCode.Created, Actions.CrUpIdea(idea, id));
+                return Request.CreateResponse(HttpStatusCode.OK, Actions.CrUpIdea(idea, id));
             }
             else
             {

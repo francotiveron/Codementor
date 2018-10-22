@@ -40,7 +40,7 @@ namespace MyIdeaPool
         //    var email = tokens.First(kvp => kvp.Value.refresh_token == refresh_token).Key;
         //    tokens.Remove(email);
         //}
-        public static bool Exists(string jwt)
+        public static bool UserExists(string jwt)
         {
             return tokens.Any(kvp => kvp.Value.jwt == jwt);
         }
@@ -65,6 +65,9 @@ namespace MyIdeaPool
         {
             return ideas.Values.Take(10).ToList();
         }
-
+        public static bool IdeaExists(string id)
+        {
+            return ideas.ContainsKey(id);
+        }
     }
 }
