@@ -12,11 +12,12 @@ namespace MyIdeaPool
 {
     internal class Actions
     {
-        internal static void CheckLogin(HttpRequestMessage request)
+        internal static string CheckLogin(HttpRequestMessage request)
         {
             var jwt = request.Headers.GetValues("X-Access-Token").First();
             if (!Storage.UserExists(jwt)) throw new AppException(HttpStatusCode.NotFound, "access token is unknown");
             if (Jwt.IsExpired(jwt)) throw new AppException(HttpStatusCode.Unauthorized, "access token is expired");
+            return Jwt.DecodeToken(jwt);
         }
         public static Jwt.Token Login(string email, string password)
         {
@@ -54,11 +55,11 @@ namespace MyIdeaPool
             return Storage.RemoveToken(refresh_token);
         }
 
-        public static Me GetMe(string jwt)
+        public static Me GetMe(string email)
         {
-            var email = Jwt.DecodeToken(jwt);
             var user = Storage.GetUser(email);
 
+            //gravatar hash calculation
             var md5Hasher = MD5.Create();
             byte[] data = md5Hasher.ComputeHash(Encoding.Default.GetBytes(email));
             var sBuilder = new StringBuilder();
@@ -76,24 +77,25 @@ namespace MyIdeaPool
             };
         }
 
-        public static Idea CrUpIdea(NewIdea _idea, string id = null)
+        public static Idea CrUpIdea(NewIdea _idea, string email, string id = null)
         {
             if (id == null) id = Guid.NewGuid().ToString();
             else
-            if (!Storage.IdeaExists(id)) throw new AppException(HttpStatusCode.Unauthorized, $"idea {id} not found");
+            if (!Storage.IdeaExists(id, email)) throw new AppException(HttpStatusCode.NotFound, $"idea {id} not found");
             var idea = new Idea(id, _idea);
-            Storage.PutIdea(idea);
+            Storage.PutIdea(idea, email);
             return idea;
 
         }
-        public static bool DeleteIdea(string id)
+        public static bool DeleteIdea(string id, string email)
         {
-            return Storage.RemoveIdea(id);
+            if (!Storage.IdeaExists(id, email)) throw new AppException(HttpStatusCode.NotFound, $"idea {id} not found");
+            return Storage.RemoveIdea(id, email);
         }
 
-        internal static List<Idea> GetIdeas()
+        internal static List<Idea> GetIdeas(string email)
         {
-            return Storage.GetIdeas();
+            return Storage.GetIdeas(email);
         }
     }
     internal class AppException : Exception

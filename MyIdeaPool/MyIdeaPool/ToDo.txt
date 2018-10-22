@@ -4,4 +4,5 @@
 + optimize model inheritance
 + idea created_at as unix epoch
 + improve error management
-- database
++ Error when delete idea is not found
++ Change error message in password validation

@@ -13,22 +13,61 @@ namespace MyIdeaPool.Controllers
 {
     public class DefaultController : ApiController
     {
-        private HttpResponseMessage Process<T>(Func<T> action, HttpStatusCode successCode = HttpStatusCode.OK, bool checkLogin = false)
+        //private HttpResponseMessage Process<T>(Func<T> action, HttpStatusCode successCode = HttpStatusCode.OK, bool checkLogin = false)
+        //{
+        //    try
+        //    {
+        //        var email = checkLogin ? Actions.CheckLogin(Request) : null;
+
+        //        if (!ModelState.IsValid) return Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState);
+        //        try
+        //        {
+        //            if (successCode == HttpStatusCode.NoContent)
+        //            {
+        //                action.DynamicInvoke();
+        //                return Request.CreateResponse(HttpStatusCode.NoContent);
+        //            }
+        //            else
+        //            {
+        //                return Request.CreateResponse(successCode, action.DynamicInvoke());
+        //            }
+        //        }
+        //        catch (TargetInvocationException ex)
+        //        {
+        //            throw ex.InnerException;
+        //        }
+        //    }
+        //    catch (AppException ex)
+        //    {
+        //        return Request.CreateErrorResponse(ex.Status, ex.ToString());
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        var sb = new StringBuilder();
+        //        for (var x = ex; x != null; x = x.InnerException) sb.Append(ExceptionInfo(x) + Environment.NewLine);
+        //        return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, sb.ToString());
+        //    }
+        //}
+
+        private HttpResponseMessage Process<T>(Func<string, T> action, HttpStatusCode successCode = HttpStatusCode.OK, bool checkLogin = false)
         {
             try
             {
-                if (checkLogin) Actions.CheckLogin(Request);
+                var email = checkLogin ? Actions.CheckLogin(Request) : null;
+
                 if (!ModelState.IsValid) return Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState);
                 try
                 {
                     if (successCode == HttpStatusCode.NoContent)
                     {
-                        action.DynamicInvoke();
+                        //action.DynamicInvoke();
+                        action(email);
                         return Request.CreateResponse(HttpStatusCode.NoContent);
                     }
                     else
                     {
-                        return Request.CreateResponse(successCode, action.DynamicInvoke());
+                        //return Request.CreateResponse(successCode, action.DynamicInvoke());
+                        return Request.CreateResponse(successCode, action(email));
                     }
                 }
                 catch (TargetInvocationException ex)
@@ -47,7 +86,6 @@ namespace MyIdeaPool.Controllers
                 return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, sb.ToString());
             }
         }
-
         private string ExceptionInfo(Exception ex)
         {
             return ex.GetType().Name + " - " + ex.Message;
@@ -58,7 +96,7 @@ namespace MyIdeaPool.Controllers
         [HttpPost]
         public HttpResponseMessage SignUp([FromBody] User user)
         {
-            return Process(() => Actions.SignUp(user), HttpStatusCode.Created);
+            return Process((dummy) => Actions.SignUp(user), HttpStatusCode.Created);
         }
 
         [Route("access-tokens/refresh")]
@@ -66,7 +104,7 @@ namespace MyIdeaPool.Controllers
         [HttpPost]
         public HttpResponseMessage RefreshJwt([FromBody] RefreshToken refresh_token)
         {
-            return Process(() => Actions.RefreshToken(refresh_token.refresh_token), HttpStatusCode.OK);
+            return Process((dummy) => Actions.RefreshToken(refresh_token.refresh_token), HttpStatusCode.OK);
         }
 
         [Route("access-tokens")]
@@ -74,7 +112,7 @@ namespace MyIdeaPool.Controllers
         [HttpPost]
         public HttpResponseMessage Login([FromBody] LoginPars login)
         {
-            return Process(() => Actions.Login(login.email, login.password), HttpStatusCode.Created);
+            return Process((dummy) => Actions.Login(login.email, login.password), HttpStatusCode.Created);
         }
 
         [Route("access-tokens")]
@@ -82,7 +120,7 @@ namespace MyIdeaPool.Controllers
         [HttpDelete]
         public HttpResponseMessage Logout([FromBody] RefreshToken refresh_token)
         {
-            return Process(() => Actions.Logout(refresh_token.refresh_token), HttpStatusCode.NoContent);
+            return Process((dummy) => Actions.Logout(refresh_token.refresh_token), HttpStatusCode.NoContent);
         }
 
         [Route("me")]
@@ -90,13 +128,14 @@ namespace MyIdeaPool.Controllers
         [HttpGet]
         public HttpResponseMessage Me()
         {
-            return Process(
-                () => {
-                      var jwt = Request.Headers.GetValues("X-Access-Token").First();
-                      return Actions.GetMe(jwt);
-                      }
-                , checkLogin: true
-            );
+            //return Process(
+            //    () => {
+            //          var jwt = Request.Headers.GetValues("X-Access-Token").First();
+            //          return Actions.GetMe(jwt);
+            //          }
+            //    , checkLogin: true
+            //);
+            return Process((email) => Actions.GetMe(email), checkLogin: true);
         }
 
         [Route("ideas")]
@@ -104,7 +143,7 @@ namespace MyIdeaPool.Controllers
         [HttpPost]
         public HttpResponseMessage CreateIdea([FromBody] NewIdea idea)
         {
-            return Process(() => Actions.CrUpIdea(idea), HttpStatusCode.Created, true);
+            return Process((email) => Actions.CrUpIdea(idea, email), HttpStatusCode.Created, true);
         }
 
         [Route("ideas/{id}")]
@@ -112,7 +151,7 @@ namespace MyIdeaPool.Controllers
         [HttpDelete]
         public HttpResponseMessage DeleteIdea(string id)
         {
-            return Process(() => Actions.DeleteIdea(id), HttpStatusCode.NoContent);
+            return Process((email) => Actions.DeleteIdea(id, email), HttpStatusCode.NoContent, true);
         }
 
         [Route("ideas/{id}")]
@@ -120,7 +159,7 @@ namespace MyIdeaPool.Controllers
         [HttpPut]
         public HttpResponseMessage UpdateIdea(string id, [FromBody] NewIdea idea)
         {
-            return Process(() => Actions.CrUpIdea(idea, id), checkLogin: true);
+            return Process((email) => Actions.CrUpIdea(idea, email, id), checkLogin: true);
         }
 
         [Route("ideas")]
@@ -133,7 +172,7 @@ namespace MyIdeaPool.Controllers
         //}
         public HttpResponseMessage GetIdeas()
         {
-            return Process(() => Actions.GetIdeas(), checkLogin: true);
+            return Process((email) => Actions.GetIdeas(email), checkLogin: true);
         }
 
     }

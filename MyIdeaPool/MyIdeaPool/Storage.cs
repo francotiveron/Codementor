@@ -10,7 +10,7 @@ namespace MyIdeaPool
     {
         private static Dictionary<string, User> users = new Dictionary<string, User>();
         private static Dictionary<string, Jwt.Token> tokens = new Dictionary<string, Jwt.Token>();
-        private static Dictionary<string, Idea> ideas = new Dictionary<string, Idea>();
+        private static Dictionary<string, Dictionary<string, Idea>> ideas = new Dictionary<string, Dictionary<string, Idea>>();
 
         public static void PutUser(User user)
         {
@@ -40,22 +40,32 @@ namespace MyIdeaPool
             tokens.Remove(refresh_token);
             return true;
         }
-        public static void PutIdea(Idea idea)
+        public static void PutIdea(Idea idea, string email)
         {
-            ideas[idea.id] = idea;
+            IdeasOf(email)[idea.id] = idea;
         }
-        public static bool RemoveIdea(string id)
+        public static bool RemoveIdea(string id, string email)
         {
-            ideas.Remove(id);
+            IdeasOf(email).Remove(id);
             return true;
         }
-        public static List<Idea> GetIdeas()
+        public static List<Idea> GetIdeas(string email)
         {
-            return ideas.Values.Take(10).ToList();
+            return IdeasOf(email).Values.Take(10).ToList();
         }
-        public static bool IdeaExists(string id)
+        public static bool IdeaExists(string id, string email)
         {
-            return ideas.ContainsKey(id);
+            return IdeasOf(email).ContainsKey(id);
+        }
+        private static Dictionary<string, Idea> IdeasOf(string email)
+        {
+            Dictionary<string, Idea> ideasOf;
+            if (!ideas.TryGetValue(email, out ideasOf))
+            {
+                ideasOf = new Dictionary<string, Idea>();
+                ideas[email] = ideasOf;
+            }
+            return ideasOf;
         }
     }
 }
