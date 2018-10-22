@@ -8,9 +8,9 @@ namespace MyIdeaPool.Models
 {
     public class LoginPars
     {
-        [Required]
+        [Required, EmailAddress]
         public string email { get; set; }
-        [Required]
+        [Required, RegularExpression("(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z]).{8,}")]
         public string password { get; set; }
     }
 }

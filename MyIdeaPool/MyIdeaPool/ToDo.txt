@@ -1,2 +1,7 @@
-﻿- Check email validation
-- Password validation
+﻿+ Check email validation
++ Password validation
++ gravatar
++ optimize model inheritance
++ idea created_at as unix epoch
++ improve error management
+- database

@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
+using System.Security.Cryptography;
+using System.Text;
 using System.Web;
 using MyIdeaPool.Models;
 
@@ -12,14 +15,14 @@ namespace MyIdeaPool
         internal static void CheckLogin(HttpRequestMessage request)
         {
             var jwt = request.Headers.GetValues("X-Access-Token").First();
-            if (!Storage.UserExists(jwt)) throw new Exception("access token is unknown");
-            if (Jwt.IsExpired(jwt)) throw new Exception("access token is expired");
+            if (!Storage.UserExists(jwt)) throw new AppException(HttpStatusCode.NotFound, "access token is unknown");
+            if (Jwt.IsExpired(jwt)) throw new AppException(HttpStatusCode.Unauthorized, "access token is expired");
         }
         public static Jwt.Token Login(string email, string password)
         {
             var user = Storage.GetUser(email);
-            if (user == null) throw new Exception("user not found");
-            if (password != user.password) throw new Exception("wrong password");
+            if (user == null) throw new AppException(HttpStatusCode.NotFound, $"user {email} not found");
+            if (password != user.password) throw new AppException(HttpStatusCode.Unauthorized, "wrong password");
 
             var token = new Jwt.Token
             {
@@ -31,8 +34,7 @@ namespace MyIdeaPool
         }
         public static Jwt.Token SignUp(User user)
         {
-            //Validation.Validate(user);
-            if (null != Storage.GetUser(user.email)) throw new Exception("user already registered");
+            if (null != Storage.GetUser(user.email)) throw new AppException(HttpStatusCode.Forbidden, $"user {user.email} already registered");
             Storage.PutUser(user);           
             return Login(user.email, user.password);
         }
@@ -47,42 +49,63 @@ namespace MyIdeaPool
             Storage.PutToken(token);
             return token.jwt;
         }
-        public static void Logout(string refresh_token)
+        public static bool Logout(string refresh_token)
         {
-            Storage.RemoveToken(refresh_token);
+            return Storage.RemoveToken(refresh_token);
         }
 
         public static Me GetMe(string jwt)
         {
             var email = Jwt.DecodeToken(jwt);
             var user = Storage.GetUser(email);
+
+            var md5Hasher = MD5.Create();
+            byte[] data = md5Hasher.ComputeHash(Encoding.Default.GetBytes(email));
+            var sBuilder = new StringBuilder();
+            for (int i = 0; i < data.Length; i++)
+            {
+                sBuilder.Append(data[i].ToString("x2"));
+            }
+            var hash = sBuilder.ToString();
+
             return new Me
             {
                 email = user.email,
                 name = user.name,
-                avatar_url = "TBI"
+                avatar_url = $"http://www.gravatar.com/avatar/{hash}"
             };
         }
 
         public static Idea CrUpIdea(NewIdea _idea, string id = null)
         {
-            //Validation.Validate(_idea);
             if (id == null) id = Guid.NewGuid().ToString();
             else
-            if (!Storage.IdeaExists(id)) throw new Exception("idea not found");
+            if (!Storage.IdeaExists(id)) throw new AppException(HttpStatusCode.Unauthorized, $"idea {id} not found");
             var idea = new Idea(id, _idea);
             Storage.PutIdea(idea);
             return idea;
 
         }
-        public static void DeleteIdea(string id)
+        public static bool DeleteIdea(string id)
         {
-            Storage.RemoveIdea(id);
+            return Storage.RemoveIdea(id);
         }
 
         internal static List<Idea> GetIdeas()
         {
             return Storage.GetIdeas();
+        }
+    }
+    internal class AppException : Exception
+    {
+        public HttpStatusCode Status { get; set; }
+        public AppException(HttpStatusCode status, string message) : base(message)
+        {
+            Status = status;
+        }
+        public override string ToString()
+        {
+            return $"Application Error: {Message}";
         }
     }
 }

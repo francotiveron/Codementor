@@ -7,14 +7,9 @@ using System.Web;
 
 namespace MyIdeaPool.Models
 {
-    public class User
+    public class User : LoginPars
     {
         [Required, MinLength(1)]
         public string name { get; set; }
-        [Required, EmailAddress]
-        public string email { get; set; }
-        //[Required, RegularExpression("")]
-        [Required]
-        public string password { get; set; }
     }
 }

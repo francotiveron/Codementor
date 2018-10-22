@@ -23,23 +23,10 @@ namespace MyIdeaPool
 
             return null;
         }
-        //public static void PutToken(string email, Jwt.Token token)
-        //{
-        //    tokens[email] = token;
-        //}
         public static void PutToken(Jwt.Token token)
         {
             tokens[token.refresh_token] = token;
         }
-        //public static KeyValuePair<string, Jwt.Token> GetTokenByRefresh(string refresh_token)
-        //{
-        //    return tokens.First(kvp => kvp.Value.refresh_token == refresh_token);
-        //}
-        //public static void RemoveTokenByRefresh(string refresh_token)
-        //{
-        //    var email = tokens.First(kvp => kvp.Value.refresh_token == refresh_token).Key;
-        //    tokens.Remove(email);
-        //}
         public static bool UserExists(string jwt)
         {
             return tokens.Any(kvp => kvp.Value.jwt == jwt);
@@ -48,19 +35,20 @@ namespace MyIdeaPool
         {
             return tokens[refresh_token];
         }
-        public static void RemoveToken(string refresh_token)
+        public static bool RemoveToken(string refresh_token)
         {
             tokens.Remove(refresh_token);
+            return true;
         }
         public static void PutIdea(Idea idea)
         {
             ideas[idea.id] = idea;
         }
-        public static void RemoveIdea(string id)
+        public static bool RemoveIdea(string id)
         {
             ideas.Remove(id);
+            return true;
         }
-
         public static List<Idea> GetIdeas()
         {
             return ideas.Values.Take(10).ToList();
