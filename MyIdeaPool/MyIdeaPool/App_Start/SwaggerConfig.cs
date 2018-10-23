@@ -1,10 +1,10 @@
-using System.Web.Http;
-using WebActivatorEx;
 using MyIdeaPool;
 using Swashbuckle.Application;
 using Swashbuckle.Swagger;
-using System.Web.Http.Description;
 using System.Collections.Generic;
+using System.Web.Http;
+using System.Web.Http.Description;
+using WebActivatorEx;
 
 [assembly: PreApplicationStartMethod(typeof(SwaggerConfig), "Register")]
 

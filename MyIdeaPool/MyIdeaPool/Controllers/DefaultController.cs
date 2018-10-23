@@ -1,18 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using MyIdeaPool.Models;
+using Swashbuckle.Swagger.Annotations;
+using System;
 using System.Net;
 using System.Net.Http;
-using System.Web.Http;
-using Swashbuckle.Swagger.Annotations;
-using MyIdeaPool.Models;
-using System.Text;
 using System.Reflection;
+using System.Text;
+using System.Web.Http;
 
 namespace MyIdeaPool.Controllers
 {
     public class DefaultController : ApiController
     {
+        /*
+         * Exception info to client
+         * Can be enriched (e.g. ex.Data)
+        */
+        private string ExceptionInfo(Exception ex)
+        {
+            return ex.GetType().Name + " - " + ex.Message;
+        }
         private HttpResponseMessage Process<T>(Func<string, T> action, HttpStatusCode successCode = HttpStatusCode.OK, bool checkLogin = false)
         {
             try
@@ -24,35 +30,31 @@ namespace MyIdeaPool.Controllers
                 {
                     if (successCode == HttpStatusCode.NoContent)
                     {
-                        //action.DynamicInvoke();
                         action(email);
                         return Request.CreateResponse(HttpStatusCode.NoContent);
                     }
                     else
                     {
-                        //return Request.CreateResponse(successCode, action.DynamicInvoke());
                         return Request.CreateResponse(successCode, action(email));
                     }
                 }
-                catch (TargetInvocationException ex)
+                catch (TargetInvocationException ex) //bypass exception layer from dynamic calls
                 {
                     throw ex.InnerException;
                 }
             }
-            catch (AppException ex)
+            catch (AppException ex) //custom
             {
                 return Request.CreateErrorResponse(ex.Status, ex.ToString());
             }
-            catch (Exception ex)
+            catch (Exception ex) 
             {
+                //avoid standard back propagation of uncaught exceptions (e.g. call stack is not propagated)
+                //drills down innerexception stack
                 var sb = new StringBuilder();
                 for (var x = ex; x != null; x = x.InnerException) sb.Append(ExceptionInfo(x) + Environment.NewLine);
                 return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, sb.ToString());
             }
-        }
-        private string ExceptionInfo(Exception ex)
-        {
-            return ex.GetType().Name + " - " + ex.Message;
         }
 
         [Route("users")]
@@ -92,13 +94,6 @@ namespace MyIdeaPool.Controllers
         [HttpGet]
         public HttpResponseMessage Me()
         {
-            //return Process(
-            //    () => {
-            //          var jwt = Request.Headers.GetValues("X-Access-Token").First();
-            //          return Actions.GetMe(jwt);
-            //          }
-            //    , checkLogin: true
-            //);
             return Process((email) => Actions.GetMe(email), checkLogin: true);
         }
 

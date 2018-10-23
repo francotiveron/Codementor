@@ -8,52 +8,61 @@ namespace MyIdeaPool
 {
     internal class Storage
     {
-        private static Dictionary<string, User> users = new Dictionary<string, User>();
-        private static Dictionary<string, Jwt.Token> tokens = new Dictionary<string, Jwt.Token>();
-        private static Dictionary<string, Dictionary<string, Idea>> ideas = new Dictionary<string, Dictionary<string, Idea>>();
         private static readonly int pageSize = 10;
+        //email -> user
+        private static Dictionary<string, User> users = new Dictionary<string, User>();
+        //refresh_token -> token
+        private static Dictionary<string, Jwt.Token> tokens = new Dictionary<string, Jwt.Token>();
+        //email -> [id -> idea]
+        private static Dictionary<string, Dictionary<string, Idea>> ideas = new Dictionary<string, Dictionary<string, Idea>>();
 
-        public static void PutUser(User user)
+        internal static void PutUser(User user)
         {
             users[user.email] = user;
         }
-        public static User GetUser(string email)
-        {
-            User user;
-            if (users.TryGetValue(email, out user)) return user;
 
+        internal static User GetUser(string email)
+        {
+            if (users.TryGetValue(email, out var user)) return user;
             return null;
         }
-        public static void PutToken(Jwt.Token token)
+
+        internal static void PutToken(Jwt.Token token)
         {
             tokens[token.refresh_token] = token;
         }
-        public static bool UserExists(string jwt)
+
+        internal static bool UserExists(string jwt)
         {
             return tokens.Any(kvp => kvp.Value.jwt == jwt);
         }
-        public static Jwt.Token GetToken(string refresh_token)
+
+        internal static Jwt.Token GetToken(string refresh_token)
         {
-            return tokens[refresh_token];
+            if (tokens.TryGetValue(refresh_token, out var token)) return token;
+            return null;
         }
-        public static bool RemoveToken(string refresh_token)
+
+        internal static bool RemoveToken(string refresh_token)
         {
-            tokens.Remove(refresh_token);
-            return true;
+            return tokens.Remove(refresh_token);
         }
-        public static void PutIdea(Idea idea, string email)
+
+        internal static void PutIdea(Idea idea, string email)
         {
             IdeasOf(email)[idea.id] = idea;
         }
-        public static bool RemoveIdea(string id, string email)
+
+        internal static bool RemoveIdea(string id, string email)
         {
-            IdeasOf(email).Remove(id);
-            return true;
+            return IdeasOf(email).Remove(id);
         }
-        public static List<Idea> GetIdeas(string email, int page)
+
+        internal static List<Idea> GetIdeas(string email, int page)
         {
             var ideas = IdeasOf(email).Values;
             List<Idea> ret;
+
             if (page >= 0)
             {
                 ret = ideas
@@ -76,14 +85,15 @@ namespace MyIdeaPool
             }
             return ret;
         }
-        public static bool IdeaExists(string id, string email)
+
+        internal static bool IdeaExists(string id, string email)
         {
             return IdeasOf(email).ContainsKey(id);
         }
+
         private static Dictionary<string, Idea> IdeasOf(string email)
         {
-            Dictionary<string, Idea> ideasOf;
-            if (!ideas.TryGetValue(email, out ideasOf))
+            if (!ideas.TryGetValue(email, out var ideasOf))
             {
                 ideasOf = new Dictionary<string, Idea>();
                 ideas[email] = ideasOf;

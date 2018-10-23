@@ -1,13 +1,15 @@
 ﻿using Microsoft.IdentityModel.Tokens;
 using System;
-using System.Linq;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Security.Claims;
 
 namespace MyIdeaPool
 {
     public class Jwt
     {
+        private static readonly int tokenExpirationMinutes = 10;
+
         public class Token
         {
             public string jwt { get; set; }
@@ -26,6 +28,7 @@ namespace MyIdeaPool
                 return securityKey;
             }
         }
+
         private static SecurityTokenDescriptor Descriptor(string email)
         {
             return new SecurityTokenDescriptor
@@ -33,16 +36,18 @@ namespace MyIdeaPool
                 Subject = new ClaimsIdentity(new[] {
                       new Claim("email", email)
                 }),
-                Expires = DateTime.UtcNow.AddMinutes(10),
+                Expires = DateTime.UtcNow.AddMinutes(tokenExpirationMinutes),
                 SigningCredentials = new SigningCredentials(Key, SecurityAlgorithms.HmacSha256Signature)
             };
         }
+
         public static string GenerateToken(string email)
         {
             var handler = new JwtSecurityTokenHandler();
             var token = handler.CreateJwtSecurityToken(Descriptor(email));
             return handler.WriteToken(token);
         }
+
         public static string DecodeToken(string jwt)
         {
             var handler = new JwtSecurityTokenHandler();

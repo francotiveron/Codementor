@@ -9,7 +9,7 @@ namespace MyIdeaPool.Models
 {
     public class User : LoginPars
     {
-        [Required, MinLength(1)]
+        [Required]
         public string name { get; set; }
     }
 }

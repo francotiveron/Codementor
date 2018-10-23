@@ -10,6 +10,7 @@ namespace MyIdeaPool.Models
     {
         [Required, EmailAddress]
         public string email { get; set; }
+
         [
             Required
             , RegularExpression(

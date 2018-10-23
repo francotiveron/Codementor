@@ -1,0 +1,1 @@
+﻿This windows forms app is to help testing the web api MyIdeaPool

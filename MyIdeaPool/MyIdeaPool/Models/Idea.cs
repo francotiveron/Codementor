@@ -15,12 +15,14 @@ namespace MyIdeaPool.Models
             ease = _idea.ease;
             confidence = _idea.confidence;
 
+            //unix epoch time
             DateTime origin = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
             TimeSpan diff = DateTime.Now.ToUniversalTime() - origin;
             created_at = (uint)Math.Floor(diff.TotalSeconds);
         }
 
         public string id { get; set; }
+        //could be optimized by static calculation at construction (if so impact, ease and confidence should be readonly)
         public float average_score { get { return (impact + ease + confidence) / 3.0f; } }
         public uint created_at { get; set; }
 

@@ -1,12 +1,11 @@
-﻿using System;
+﻿using MyIdeaPool.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Security.Cryptography;
 using System.Text;
-using System.Web;
-using MyIdeaPool.Models;
 
 namespace MyIdeaPool
 {
@@ -19,7 +18,8 @@ namespace MyIdeaPool
             if (Jwt.IsExpired(jwt)) throw new AppException(HttpStatusCode.Unauthorized, "access token is expired");
             return Jwt.DecodeToken(jwt);
         }
-        public static Jwt.Token Login(string email, string password)
+
+        internal static Jwt.Token Login(string email, string password)
         {
             var user = Storage.GetUser(email);
             if (user == null) throw new AppException(HttpStatusCode.NotFound, $"user {email} not found");
@@ -33,16 +33,20 @@ namespace MyIdeaPool
             Storage.PutToken(token);
             return token;
         }
-        public static Jwt.Token SignUp(User user)
+
+        internal static Jwt.Token SignUp(User user)
         {
             if (null != Storage.GetUser(user.email)) throw new AppException(HttpStatusCode.Forbidden, $"user {user.email} already registered");
             Storage.PutUser(user);           
             return Login(user.email, user.password);
         }
-        public static string RefreshToken(string refresh_token)
+
+        internal static string RefreshToken(string refresh_token)
         {
-            var email = Jwt.DecodeToken(Storage.GetToken(refresh_token).jwt);
-            var token = new Jwt.Token
+            var token = Storage.GetToken(refresh_token);
+            if (token == null) throw new AppException(HttpStatusCode.NotFound, $"refresh_token {refresh_token} not found");
+            var email = Jwt.DecodeToken(token.jwt);
+            token = new Jwt.Token
             {
                 jwt = Jwt.GenerateToken(email),
                 refresh_token = refresh_token
@@ -50,15 +54,17 @@ namespace MyIdeaPool
             Storage.PutToken(token);
             return token.jwt;
         }
-        public static bool Logout(string refresh_token)
+        internal static bool Logout(string refresh_token)
         {
+            if (null == Storage.GetToken(refresh_token)) throw new AppException(HttpStatusCode.NotFound, $"refresh_token {refresh_token} not found");
             return Storage.RemoveToken(refresh_token);
         }
 
-        public static Me GetMe(string email)
+        internal static Me GetMe(string email)
         {
             var user = Storage.GetUser(email);
 
+            //build gravatar hash
             var md5Hasher = MD5.Create();
             byte[] data = md5Hasher.ComputeHash(Encoding.Default.GetBytes(email));
             var sBuilder = new StringBuilder();
@@ -76,17 +82,19 @@ namespace MyIdeaPool
             };
         }
 
-        public static Idea CrUpIdea(NewIdea _idea, string email, string id = null)
+        //Create or Update
+        internal static Idea CrUpIdea(NewIdea _idea, string email, string id = null)
         {
             if (id == null) id = Guid.NewGuid().ToString();
             else
             if (!Storage.IdeaExists(id, email)) throw new AppException(HttpStatusCode.NotFound, $"idea {id} not found");
+
             var idea = new Idea(id, _idea);
             Storage.PutIdea(idea, email);
             return idea;
-
         }
-        public static bool DeleteIdea(string id, string email)
+
+        internal static bool DeleteIdea(string id, string email)
         {
             if (!Storage.IdeaExists(id, email)) throw new AppException(HttpStatusCode.NotFound, $"idea {id} not found");
             return Storage.RemoveIdea(id, email);
@@ -97,9 +105,10 @@ namespace MyIdeaPool
             return Storage.GetIdeas(email, page);
         }
     }
+
     internal class AppException : Exception
     {
-        public HttpStatusCode Status { get; set; }
+        public HttpStatusCode Status { get; private set; }
         public AppException(HttpStatusCode status, string message) : base(message)
         {
             Status = status;
