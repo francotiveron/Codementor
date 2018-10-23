@@ -16,8 +16,8 @@ namespace WindowsFormsApp1
 {
     public partial class Form1 : Form
     {
-        private static string url = "http://localhost:49875/";
-        //private static string url = "https://myideapool20181020072700.azurewebsites.net";
+        //private static string url = "http://localhost:49875/";
+        private static string url = "https://myideapool20181020072700.azurewebsites.net";
         private static HttpClient client = new HttpClient();
         private static HttpResponseMessage response;
 
