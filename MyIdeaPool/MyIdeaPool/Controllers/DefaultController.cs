@@ -13,42 +13,6 @@ namespace MyIdeaPool.Controllers
 {
     public class DefaultController : ApiController
     {
-        //private HttpResponseMessage Process<T>(Func<T> action, HttpStatusCode successCode = HttpStatusCode.OK, bool checkLogin = false)
-        //{
-        //    try
-        //    {
-        //        var email = checkLogin ? Actions.CheckLogin(Request) : null;
-
-        //        if (!ModelState.IsValid) return Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState);
-        //        try
-        //        {
-        //            if (successCode == HttpStatusCode.NoContent)
-        //            {
-        //                action.DynamicInvoke();
-        //                return Request.CreateResponse(HttpStatusCode.NoContent);
-        //            }
-        //            else
-        //            {
-        //                return Request.CreateResponse(successCode, action.DynamicInvoke());
-        //            }
-        //        }
-        //        catch (TargetInvocationException ex)
-        //        {
-        //            throw ex.InnerException;
-        //        }
-        //    }
-        //    catch (AppException ex)
-        //    {
-        //        return Request.CreateErrorResponse(ex.Status, ex.ToString());
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        var sb = new StringBuilder();
-        //        for (var x = ex; x != null; x = x.InnerException) sb.Append(ExceptionInfo(x) + Environment.NewLine);
-        //        return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, sb.ToString());
-        //    }
-        //}
-
         private HttpResponseMessage Process<T>(Func<string, T> action, HttpStatusCode successCode = HttpStatusCode.OK, bool checkLogin = false)
         {
             try
@@ -165,14 +129,9 @@ namespace MyIdeaPool.Controllers
         [Route("ideas")]
         [SwaggerOperation("Get ideas")]
         [HttpGet]
-        //public List<Idea> GetIdeas()
-        //{
-        //    Actions.CheckLogin(Request);
-        //    return Actions.GetIdeas();
-        //}
-        public HttpResponseMessage GetIdeas()
+        public HttpResponseMessage GetIdeas(int page = -1)
         {
-            return Process((email) => Actions.GetIdeas(email), checkLogin: true);
+            return Process((email) => Actions.GetIdeas(email, page), checkLogin: true);
         }
 
     }

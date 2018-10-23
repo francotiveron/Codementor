@@ -6,3 +6,5 @@
 + improve error management
 + Error when delete idea is not found
 + Change error message in password validation
++ sort ideas in get ideas
+- comments

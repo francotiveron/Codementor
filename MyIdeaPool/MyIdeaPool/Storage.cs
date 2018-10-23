@@ -11,6 +11,7 @@ namespace MyIdeaPool
         private static Dictionary<string, User> users = new Dictionary<string, User>();
         private static Dictionary<string, Jwt.Token> tokens = new Dictionary<string, Jwt.Token>();
         private static Dictionary<string, Dictionary<string, Idea>> ideas = new Dictionary<string, Dictionary<string, Idea>>();
+        private static readonly int pageSize = 10;
 
         public static void PutUser(User user)
         {
@@ -49,9 +50,32 @@ namespace MyIdeaPool
             IdeasOf(email).Remove(id);
             return true;
         }
-        public static List<Idea> GetIdeas(string email)
+        public static List<Idea> GetIdeas(string email, int page)
         {
-            return IdeasOf(email).Values.Take(10).ToList();
+            //return IdeasOf(email).Values.Take(10).ToList();
+            var ideas = IdeasOf(email).Values;
+            List<Idea> ret;
+            if (page >= 0)
+            {
+                ret = ideas
+                    .OrderBy(idea => idea.created_at)
+                    .Skip(page * pageSize)
+                    .Take(pageSize)
+                    .ToList();
+            }
+            else
+            {
+                ret = new List<Idea>();
+                var n = ideas.Count;
+                if (n > 0)
+                {
+                    var m = Math.Min(pageSize, n);
+                    var r = new Random();
+                    var idx = Enumerable.Range(0, n).OrderBy(x => r.Next()).Take(m);
+                    foreach (var i in idx) ret.Add(ideas.ElementAt(i));
+                }
+            }
+            return ret;
         }
         public static bool IdeaExists(string id, string email)
         {

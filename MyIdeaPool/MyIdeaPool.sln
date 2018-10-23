@@ -7,8 +7,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyIdeaPool", "MyIdeaPool\My
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WindowsFormsApp1", "WindowsFormsApp1\WindowsFormsApp1.csproj", "{238D8727-3EE7-4A4C-97FE-7064281C9C08}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApplication1", "WebApplication1\WebApplication1.csproj", "{6BCA716D-88DE-4E70-AEB0-D16CA7D91B0C}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,12 +21,11 @@ Global
 		{238D8727-3EE7-4A4C-97FE-7064281C9C08}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{238D8727-3EE7-4A4C-97FE-7064281C9C08}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{238D8727-3EE7-4A4C-97FE-7064281C9C08}.Release|Any CPU.Build.0 = Release|Any CPU
-		{6BCA716D-88DE-4E70-AEB0-D16CA7D91B0C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6BCA716D-88DE-4E70-AEB0-D16CA7D91B0C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6BCA716D-88DE-4E70-AEB0-D16CA7D91B0C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6BCA716D-88DE-4E70-AEB0-D16CA7D91B0C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E85750D7-2C6C-4D89-B29E-71286A369A97}
 	EndGlobalSection
 EndGlobal

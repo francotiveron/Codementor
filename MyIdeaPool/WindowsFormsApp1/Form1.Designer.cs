@@ -59,6 +59,7 @@
             this.UpdateIdeaButton = new System.Windows.Forms.Button();
             this.GetIdeasButton = new System.Windows.Forms.Button();
             this.LastResponseCodeLabel = new System.Windows.Forms.Label();
+            this.PageTextBox = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // SignUpButton
@@ -328,11 +329,19 @@
             this.LastResponseCodeLabel.TabIndex = 26;
             this.LastResponseCodeLabel.Text = "Code";
             // 
+            // PageTextBox
+            // 
+            this.PageTextBox.Location = new System.Drawing.Point(514, 54);
+            this.PageTextBox.Name = "PageTextBox";
+            this.PageTextBox.Size = new System.Drawing.Size(34, 20);
+            this.PageTextBox.TabIndex = 27;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1201, 684);
+            this.Controls.Add(this.PageTextBox);
             this.Controls.Add(this.LastResponseCodeLabel);
             this.Controls.Add(this.GetIdeasButton);
             this.Controls.Add(this.UpdateIdeaButton);
@@ -404,6 +413,7 @@
         private System.Windows.Forms.Button UpdateIdeaButton;
         private System.Windows.Forms.Button GetIdeasButton;
         private System.Windows.Forms.Label LastResponseCodeLabel;
+        private System.Windows.Forms.TextBox PageTextBox;
     }
 }
 

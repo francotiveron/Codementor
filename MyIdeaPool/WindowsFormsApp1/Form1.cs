@@ -17,6 +17,7 @@ namespace WindowsFormsApp1
     public partial class Form1 : Form
     {
         private static string url = "http://localhost:49875/";
+        //private static string url = "https://myideapool20181020072700.azurewebsites.net";
         private static HttpClient client = new HttpClient();
         private static HttpResponseMessage response;
 
@@ -166,7 +167,11 @@ namespace WindowsFormsApp1
 
         private async void GetIdeasButton_Click(object sender, EventArgs e)
         {
-            var request = new HttpRequestMessage(HttpMethod.Get, @"ideas");
+            var url = "ideas";
+            int page;
+            if (int.TryParse(PageTextBox.Text, out page)) url = $"{url}?page={page}";
+
+            var request = new HttpRequestMessage(HttpMethod.Get, url);
             request.Headers.Add("X-Access-Token", JwtTextBox.Text);
             response = await client.SendAsync(request);
             Upd();

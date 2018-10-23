@@ -93,9 +93,9 @@ namespace MyIdeaPool
             return Storage.RemoveIdea(id, email);
         }
 
-        internal static List<Idea> GetIdeas(string email)
+        internal static List<Idea> GetIdeas(string email, int page)
         {
-            return Storage.GetIdeas(email);
+            return Storage.GetIdeas(email, page);
         }
     }
     internal class AppException : Exception
