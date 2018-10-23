@@ -59,7 +59,6 @@ namespace MyIdeaPool
         {
             var user = Storage.GetUser(email);
 
-            //gravatar hash calculation
             var md5Hasher = MD5.Create();
             byte[] data = md5Hasher.ComputeHash(Encoding.Default.GetBytes(email));
             var sBuilder = new StringBuilder();

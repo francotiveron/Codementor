@@ -52,7 +52,6 @@ namespace MyIdeaPool
         }
         public static List<Idea> GetIdeas(string email, int page)
         {
-            //return IdeasOf(email).Values.Take(10).ToList();
             var ideas = IdeasOf(email).Values;
             List<Idea> ret;
             if (page >= 0)
